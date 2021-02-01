@@ -11,6 +11,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 )
 
 var COLORS = map[string]string{
@@ -154,13 +155,12 @@ func main() {
 		}
 		var fields string
 		for s, cur := range CurOut {
-			if s != "level" && s != "msg" && s != "time" && s!="prefix" {
+			if s != "level" && s != "msg" && s != "time" && s != "prefix" {
 				fields += s + "=" + cur + " "
 			}
 		}
 		prefix, ok := CurOut["prefix"]
 		if !ok {
-			fmt.Println("prefix not found")
 			prefix = "ALL"
 		}
 		color := COLORS[lvl]
@@ -171,23 +171,24 @@ func main() {
 			tm = strings.Split(tm, " ")[1]
 		}
 
-		fmt.Printf("%s%s\033[0m\t%s\t[%s]%s\t%s\n", color, strings.ToTitle(lvl), tm,prefix, msg, fields)
+		fmt.Printf("%s%s\033[0m\t%s\t[%s]%s\t%s\n", color, strings.ToTitle(lvl), tm, prefix, msg, fields)
 
 	}
 	if *showStats {
 		fmt.Printf("\n\033[38;05;68mSTATS: \n\033[0m INFO:\t WARN:\t ERRO:\t FATA:\t PANI:\t  ALL:\n%6d\t%6d\t%6d\t%6d\t%6d\t%6d\n", infoC, warnC, erroC, fataC, paniC, infoC+warnC+erroC+fataC+paniC)
 	}
 	if *cont {
-		if *TCPAddr!=""{
+		if *TCPAddr != "" {
 			Src, err = net.Dial("tcp", *TCPAddr)
 			if err != nil {
 				log.Fatal("Src open fail:", err)
 				return
 			}
-			fmt.Fprint(Src,"connect\n")
+			fmt.Fprint(Src, "connect\n")
 			fmt.Println("\033[01mCONNECTED\033[0m")
 		}
 		for {
+			time.Sleep(time.Millisecond * 10)
 			var newdata []byte
 			if *TCPAddr != "" {
 				newdata, err = bufio.NewReader(Src).ReadBytes('\n')
@@ -242,13 +243,12 @@ func main() {
 					}
 					var fields string
 					for s, cur := range CurOut {
-						if s != "level" && s != "msg" && s != "time" && s!="prefix" {
+						if s != "level" && s != "msg" && s != "time" && s != "prefix" {
 							fields += s + "=" + cur + " "
 						}
 					}
 					prefix, ok := CurOut["prefix"]
 					if !ok {
-						fmt.Println("prefix not found")
 						prefix = "ALL"
 					}
 					color := COLORS[lvl]
@@ -259,7 +259,7 @@ func main() {
 						tm = strings.Split(tm, " ")[1]
 					}
 
-					fmt.Printf("%s%s\033[0m\t%s\t[%s]%s\t%s\n", color, strings.ToTitle(lvl), tm,prefix, msg, fields)
+					fmt.Printf("%s%s\033[0m\t%s\t[%s]%s\t%s\n", color, strings.ToTitle(lvl), tm, prefix, msg, fields)
 
 				}
 			}
